@@ -40,35 +40,35 @@ class CoughRecorder:
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
-        # Clinical Information Section
+        #clinical info section
         clinical_frame = ttk.LabelFrame(main_frame, text="Clinical Information", padding="10")
         clinical_frame.grid(row=0, column=0, pady=10, sticky=(tk.W, tk.E))
         
-        # Age input
+        #age input
         ttk.Label(clinical_frame, text="Age (years):").grid(row=0, column=0, padx=5, pady=2)
         self.age_var = tk.StringVar(value="35")
         self.age_entry = ttk.Entry(clinical_frame, textvariable=self.age_var, width=10)
         self.age_entry.grid(row=0, column=1, padx=5, pady=2)
         
-        # Height input
+        #height input
         ttk.Label(clinical_frame, text="Height (cm):").grid(row=1, column=0, padx=5, pady=2)
         self.height_var = tk.StringVar(value="170")
         self.height_entry = ttk.Entry(clinical_frame, textvariable=self.height_var, width=10)
         self.height_entry.grid(row=1, column=1, padx=5, pady=2)
         
-        # Weight input
+        #weight input
         ttk.Label(clinical_frame, text="Weight (kg):").grid(row=2, column=0, padx=5, pady=2)
         self.weight_var = tk.StringVar(value="70")
         self.weight_entry = ttk.Entry(clinical_frame, textvariable=self.weight_var, width=10)
         self.weight_entry.grid(row=2, column=1, padx=5, pady=2)
         
-        # Cough duration input
+        #cough duration input
         ttk.Label(clinical_frame, text="Cough Duration (days):").grid(row=3, column=0, padx=5, pady=2)
         self.cough_duration_var = tk.StringVar(value="7")
         self.cough_duration_entry = ttk.Entry(clinical_frame, textvariable=self.cough_duration_var, width=10)
         self.cough_duration_entry.grid(row=3, column=1, padx=5, pady=2)
         
-        # Recording controls
+        #recording controls
         control_frame = ttk.Frame(main_frame)
         control_frame.grid(row=1, column=0, pady=10)
         
@@ -93,7 +93,7 @@ class CoughRecorder:
             height = float(self.height_var.get())
             weight = float(self.weight_var.get())
             cough_duration = float(self.cough_duration_var.get())
-            
+            #set criteria for variables
             if not (0 < age < 120):
                 raise ValueError("Age must be between 0 and 120 years")
             if not (50 < height < 250):
@@ -105,7 +105,7 @@ class CoughRecorder:
                 
             return True
         except ValueError as e:
-            messagebox.showerror("Invalid Input", str(e))
+            messagebox.showerror("invalid", str(e))
             return False
 
     def validate_and_start_recording(self):
@@ -140,14 +140,14 @@ class CoughRecorder:
         return audio_data
 
     def process_audio(self, audio_data):
-        # Normalize audio
+        #normalize audio
         audio_data = audio_data.flatten()
         
-        # Apply pre-emphasis filter
+        #apply pre emphasis filter
         pre_emphasis = 0.97
         audio_data = np.append(audio_data[0], audio_data[1:] - pre_emphasis * audio_data[:-1])
         
-        # Generate mel spectrogram with VGGish-like parameters
+        #generate mel spectrogram
         mel_spec = librosa.feature.melspectrogram(
             y=audio_data,
             sr=self.sample_rate,
@@ -160,16 +160,16 @@ class CoughRecorder:
             power=2.0
         )
         
-        # Convert to log scale
+        #convert to log scale
         mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max, top_db=80)
         
-        # Normalize the spectrogram
+        #normalize the spectrogram
         mel_spec_db = (mel_spec_db - mel_spec_db.mean()) / (mel_spec_db.std() + 1e-5)
         
-        # Reshape to match training dimensions
+        #reshape to match training dimensions
         mel_spec_db = mel_spec_db.T
         
-        # Ensure exact shape match
+        #ensure exact shape match
         target_length = 128
         if mel_spec_db.shape[0] < target_length:
             pad_length = target_length - mel_spec_db.shape[0]
@@ -177,10 +177,10 @@ class CoughRecorder:
         else:
             mel_spec_db = mel_spec_db[:target_length, :]
         
-        # Calculate sound prediction score
+        #calculate sound prediction score
         sound_score = np.max(np.abs(audio_data))  # Use peak amplitude as sound score
         
-        # Get clinical features from UI
+        #clinical features from UI
         clinical_features = np.array([
             float(self.age_var.get()),
             float(self.height_var.get()),
@@ -191,17 +191,17 @@ class CoughRecorder:
             sound_score
         ])
         
-        # Flatten and combine features
+        #flatten and combine features
         mel_features = mel_spec_db.flatten()
         all_features = np.concatenate([mel_features, clinical_features])
         
-        # Reshape for model input
+        #reshape for model input
         features = all_features.reshape(1, -1)
         
-        # Scale features
+        #scale features
         features_scaled = self.scaler.transform(features)
         
-        # Get prediction
+        #prediction
         prediction = self.model.predict_proba(features_scaled)[0]
         return prediction[1]
 
