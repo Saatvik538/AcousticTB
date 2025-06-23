@@ -8,26 +8,23 @@ import librosa
 import random
 import shutil
 
-# Set a custom temp directory in the current working directory
+#custom temp directory in the current working directory
 temp_dir = os.path.join(os.getcwd(), "temp_audio_processing")
 if os.path.exists(temp_dir):
     shutil.rmtree(temp_dir)
 os.makedirs(temp_dir, exist_ok=True)
 tempfile.tempdir = temp_dir
 
-# Paths
+#paths
 RAW_DIR = os.path.join("data", "raw")
 SOLICITED_META_DIR = os.path.join(RAW_DIR, "solicited_coughs", "metadata")
 PROCESSED_DIR = os.path.join("data", "processed")
 SOLICITED_META_FILE = os.path.normpath(os.path.join(SOLICITED_META_DIR, "CODA_TB_Solicited_Meta_Info.csv"))
 CLINICAL_META_FILE = os.path.normpath(os.path.join(SOLICITED_META_DIR, "CODA_TB_Clinical_Meta_Info.csv"))
 
-# Load VGGish model
-model_dir = 'C:/Users/Saatvik/.vscode/AcousticTB/'
-vggish_model = tf.saved_model.load(model_dir)
 
 def add_noise(audio, noise_type, noise_factor=0.005):
-    """Add different types of noise to the audio"""
+    #add different types of noise to the audio
     if noise_type == "gaussian":
         noise = np.random.normal(0, noise_factor, len(audio))
         return audio + noise
@@ -49,12 +46,7 @@ def extract_features(audio_path, sample_rate=16000, add_noise_prob=0.3):
     else:
         noise_type = "none"
     
-    mel_spectrogram = librosa.feature.melspectrogram(
-        y=audio, 
-        sr=sr, 
-        n_mels=64, 
-        fmax=8000
-    )
+    mel_spectrogram = librosa.feature.melspectrogram(y=audio, sr=sr, n_mels=64, fmax=8000)
     
     mel_spectrogram = mel_spectrogram.T
     
@@ -64,13 +56,10 @@ def extract_features(audio_path, sample_rate=16000, add_noise_prob=0.3):
     return mel_spectrogram, noise_type
 
 def process_metadata(metadata_file, clinical_file, audio_dir, process_all=True):
-    if not os.path.exists(metadata_file):
-        raise FileNotFoundError(f"Metadata file not found: {metadata_file}")
-
     metadata = pd.read_csv(metadata_file)
     clinical_data = pd.read_csv(clinical_file)
     
-    # Merge metadata with clinical data
+    #merge metadata with clinical data
     merged_data = pd.merge(metadata, clinical_data, on='participant', how='left')
     
     new_metadata = []
@@ -102,7 +91,7 @@ def process_metadata(metadata_file, clinical_file, audio_dir, process_all=True):
                 new_row['noise_type'] = noise_type
                 new_metadata.append(new_row)
         else:
-            print(f"File not found: {audio_path}")
+            print("file not found")
 
     return pd.DataFrame(new_metadata)
 
@@ -119,7 +108,7 @@ def main():
     print(f"Saved updated metadata to: {output_metadata_file}")
     print(f"Total processed files (including noisy versions): {len(solicited_metadata)}")
 
-    # Clean up temporary directory
+    #clean up temporary directory
     shutil.rmtree(temp_dir)
 
 if __name__ == "__main__":
