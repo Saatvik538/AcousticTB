@@ -44,7 +44,7 @@ def load_features_and_labels(features_csv, clinical_csv, noisy_csv, file_pattern
         filename_without_npy = filename.replace('.npy', '')
 
         if 'noise' in filename:
-            # This is a noisy sample
+            #noisy sample
             matching_row = noisy_df[noisy_df['feature_path'].str.contains(filename)]
             if not matching_row.empty:
                 feature = np.load(file_path)
@@ -58,7 +58,7 @@ def load_features_and_labels(features_csv, clinical_csv, noisy_csv, file_pattern
                 
                 noise_types.append(matching_row['noise_type'].values[0])
         else:
-            # This is an original sample
+            #original sample
             matching_row = features_df[features_df['filename'] == filename_without_npy]
             if not matching_row.empty:
                 participant = matching_row['participant'].values[0]
@@ -81,7 +81,7 @@ def load_features_and_labels(features_csv, clinical_csv, noisy_csv, file_pattern
     labels_array = np.array(labels)
     clinical_array = np.array(clinical_data)
 
-    print(f"Loaded {len(features_array)} samples with shape {features_array.shape[1:]} and labels.")
+    print(f"Loaded {len(features_array)} samples with shape {features_array.shape[1:]} and labels")
     print("Noise type distribution:", Counter(noise_types))
     return features_array, labels_array, clinical_array, noise_types
 
@@ -166,9 +166,7 @@ def evaluate_model(model, X_val, y_val, noise_types_val, feature_names=None):
         
         cm_noise = confusion_matrix(y_val_noise, y_pred_noise)
         plt.figure(figsize=(8, 6))
-        sns.heatmap(cm_noise, annot=True, fmt='d', cmap='Blues', 
-                    xticklabels=['No TB', 'TB'], 
-                    yticklabels=['No TB', 'TB'])
+        sns.heatmap(cm_noise, annot=True, fmt='d', cmap='Blues', xticklabels=['No TB', 'TB'], yticklabels=['No TB', 'TB'])
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.title(f'Confusion Matrix for {noise_type} noise')
@@ -211,18 +209,17 @@ def main():
 
     model = train_model(X_train_resampled, y_train_resampled)
 
-    feature_names = ([f'audio_{i}' for i in range(X_audio_flat.shape[1])] + 
-                    ['age', 'height', 'weight', 'reported_cough_dur', 'heart_rate', 'temperature', 'sound_prediction_score'])
+    feature_names = ([f'audio_{i}' for i in range(X_audio_flat.shape[1])] + ['age', 'height', 'weight', 'reported_cough_dur', 'heart_rate', 'temperature', 'sound_prediction_score'])
 
     evaluate_model(model, X_val, y_val, noise_types_val, feature_names)
 
-    # Save the trained model and scaler
+    #save the trained model and scaler
     print("\nSaving model and scaler...")
     joblib.dump(model, 'tb_detection_model.joblib')
     joblib.dump(scaler, 'scaler.joblib')
     print("Model and scaler saved successfully!")
 
-    # Perform cross-validation
+    #cross-validation
     cv_scores = cross_val_score(model, X_scaled, y, cv=5, scoring='roc_auc')
     print(f"\nCross-validation ROC AUC scores: {cv_scores}")
     print(f"Mean CV ROC AUC: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
