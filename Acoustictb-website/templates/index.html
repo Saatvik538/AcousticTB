@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AcousticTB</title>
+  <style>
+    body { font-family: sans-serif; max-width:600px; margin:2em auto; }
+    button { margin-right:1em; }
+    .result, .error { margin-top:1em; padding:1em; border:1px solid #ccc; }
+    .error { color:#c00; border-color:#c00; }
+  </style>
+</head>
+<body>
+  <h1>AcousticTB</h1>
+  <button id="startBtn">🎤 Start Recording</button>
+  <button id="stopBtn" disabled>⏹ Stop & Analyze</button>
+  <br><audio id="player" controls style="display:none; margin-top:1em;"></audio>
+  <div id="feedback"></div>
+
+  <script>
+    let recorder, chunks=[];
+    const startBtn = document.getElementById('startBtn'),
+          stopBtn  = document.getElementById('stopBtn'),
+          player   = document.getElementById('player'),
+          fb       = document.getElementById('feedback');
+
+    startBtn.onclick = async () => {
+      fb.textContent = '';
+      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+      recorder = new MediaRecorder(stream);
+      chunks=[];
+      recorder.ondataavailable = e=>chunks.push(e.data);
+      recorder.onstop = onStop;
+      recorder.start();
+      startBtn.disabled=true; stopBtn.disabled=false;
+      fb.textContent='Recording…';
+    };
+
+    stopBtn.onclick = () => {
+      recorder.stop();
+      stopBtn.disabled=true; startBtn.disabled=false;
+      fb.textContent='Processing…';
+    };
+
+    async function onStop(){
+      const blob = new Blob(chunks, {type:'audio/webm'});
+      player.src = URL.createObjectURL(blob);
+      player.style.display='block';
+
+      fb.textContent='Uploading…';
+      const form = new FormData();
+      form.append('coughfile', blob, 'recording.webm');
+
+      try {
+        const res = await fetch('/predict',{method:'POST',body:form});
+        const j   = await res.json();
+        if(!res.ok){
+          fb.innerHTML=`<div class="error">${j.error||j.details}</div>`;
+        } else {
+          fb.innerHTML=`
+            <div class="result">
+              <strong>${j.result}</strong><br>
+              Confidence: ${j.confidence}<br>
+              Noise: ${j.noise_type}
+            </div>`;
+        }
+      } catch(err){
+        fb.innerHTML=`<div class="error">Fetch error: ${err.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
