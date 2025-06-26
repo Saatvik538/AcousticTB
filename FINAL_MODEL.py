@@ -123,7 +123,7 @@ def loadfeaturesandlabels(features_csv, clinical_csv, noisy_csv, file_pattern):
                 
                 if not clinical_row.empty:
                     feature = np.load(file_path)
-                    feature = pad_or_truncate(feature)
+                    feature = p_or_t(feature)
                     features.append(feature)
                     labels.append(int(clinical_row['tb_status'].values[0]))
                     
