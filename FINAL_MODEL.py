@@ -73,7 +73,7 @@ def perform_statistical_analysis(y_true, y_pred, y_pred_proba):
     plt.close()
     
     return {'sensitivity': sensitivity, 'specificity': specificity, 'ppv': ppv, 'npv': npv, 'mcnemar_p': mcnemar_p, 'kappa': kappa, 'ci': (ci_lower, ci_upper)}
-def pad_or_truncate(feature, target_shape=(128, 64)):
+def p_or_t(feature, target_shape=(128, 64)):
     original_shape = feature.shape
     if original_shape[0] < target_shape[0]:
         padding = target_shape[0] - original_shape[0]
@@ -82,7 +82,7 @@ def pad_or_truncate(feature, target_shape=(128, 64)):
         feature = feature[:target_shape[0], :]
     return feature
 
-def load_features_and_labels(features_csv, clinical_csv, noisy_csv, file_pattern):
+def loadfeaturesandlabels(features_csv, clinical_csv, noisy_csv, file_pattern):
     features, labels, clinical_data, noise_types, groups = [], [], [], [], []
     noise_types = []
 
@@ -105,7 +105,7 @@ def load_features_and_labels(features_csv, clinical_csv, noisy_csv, file_pattern
             matching_row = noisy_df[noisy_df['feature_path'].str.contains(filename)]
             if not matching_row.empty:
                 feature = np.load(file_path)
-                feature = pad_or_truncate(feature)
+                feature = p_or_t(feature)
                 features.append(feature)
                 labels.append(int(matching_row['tb_status'].values[0]))
                 
@@ -219,7 +219,7 @@ def evaluate_model(model, X_val, y_val, noise_types_val, feature_names=None):
         plt.show()
 
     return accuracy, auc_roc
-def generate_comprehensive_results():
+def generate_results():
     #performance comparison with baseline methods
     models = ['Random Forest', 'SVM', 'XGBoost (Ours)', 'CNN']
     accuracies = [0.89, 0.91, 0.9516, 0.88]
@@ -247,7 +247,7 @@ def main():
     noisy_csv = "data/processed/solicited_metadata_with_noise.csv"
     feature_files = "data/processed/features/*.npy"
 
-    X_audio, y, X_clinical, noise_types, groups = load_features_and_labels(features_csv, clinical_csv, noisy_csv, feature_files)
+    X_audio, y, X_clinical, noise_types, groups = loadfeaturesandlabels(features_csv, clinical_csv, noisy_csv, feature_files)
 
     X_audio_flat = X_audio.reshape(X_audio.shape[0], -1)
     X = np.hstack((X_audio_flat, X_clinical))
@@ -294,7 +294,7 @@ def main():
     print(f"McNemar's test p-value: {stats_results['mcnemar_p']:.4f}")
     print(f"Cohen's Kappa: {stats_results['kappa']:.4f}")
     print(f"95% Confidence Interval: [{stats_results['ci'][0]:.4f}, {stats_results['ci'][1]:.4f}]")
-    generate_comprehensive_results()
+    generate_results()
     print("\nSaving processed data...")
     np.save('X_processed.npy', X_scaled)
     np.save('y_processed.npy', y)
@@ -322,7 +322,7 @@ def main():
         best = grid.best_estimator_
         nested_scores.append( roc_auc_score(y_te, best.predict_proba(X_te)[:,1]) )
 
-    print(f"Nested 5x3 CV ROC AUC: {np.mean(nested_scores):.4f} ± {np.std(nested_scores):.4f}")
+    print(f"Nested 5x3 CV ROC AUC: {np.mean(nested_scores):.4f} + - {np.std(nested_scores):.4f}")
 
 if __name__ == "__main__":
     main()
