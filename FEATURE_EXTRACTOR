@@ -97,9 +97,6 @@ def process_metadata(metadata_file, clinical_file, audio_dir, process_all=True):
 
 def main():
     solicited_audio_dir = os.path.join(RAW_DIR, "solicited_coughs", "audio")
-    if not os.path.exists(solicited_audio_dir):
-        raise FileNotFoundError(f"Audio directory not found: {solicited_audio_dir}")
-
     process_all = True
     solicited_metadata = process_metadata(SOLICITED_META_FILE, CLINICAL_META_FILE, solicited_audio_dir, process_all)
 
