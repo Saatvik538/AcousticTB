@@ -121,6 +121,12 @@ The model includes a comprehensive evaluation:
 - **Feature importance**: Interpretability for medical use
 - **Noise resilience**: Performance across environments
 
+Results on validation set:
+Total samples: 5865 | TB+: 1785 (30.4%) | TB-: 4080 (69.6%)
+Training patients: 7817 | Validation patients: 1955
+<img width="1589" height="1189" alt="image" src="https://github.com/user-attachments/assets/9d919cec-5626-4b19-a992-7af0a3450c75" />
+
+
 ## Requirements
 
 - Python 3.8+
@@ -138,6 +144,7 @@ The model includes a comprehensive evaluation:
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
 
