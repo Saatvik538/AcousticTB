@@ -32,38 +32,35 @@ graph TD
 ## Quick Start
 
 1. **Clone repository**:
-  \\\ash
-  git clone https://github.com/Saatvik538/AcousticTB.git
-  cd AcousticTB
-  \\\
+git clone https://github.com/your-username/AcousticTB.git
+cd AcousticTB
 
-2. **Install dependencies**:
-  \\\ash
-  pip install tensorflow scikit-learn xgboost librosa matplotlib seaborn tqdm pandas numpy
-  \\\
+3. **Install dependencies**:
+pip install tensorflow scikit-learn xgboost librosa matplotlib seaborn tqdm pandas numpy
 
-3. **Run data augmentation**:
-  \\\python
-  %run src/data_augmentation.py
-  \\\
+4. **Run data augmentation**:
+python %run src/data_augmentation.py
 
-4. **Execute pipeline**: Open and run \AcousticTB.ipynb\
+6. **Execute pipeline**: Open and run \AcousticTB_FINAL.ipynb\
 
 ## Project Structure
 
-\\\
+```
 AcousticTB/
-├── AcousticTB.ipynb              # Main pipeline notebook
+├── AcousticTB_FINAL.ipynb     # Main pipeline notebook
+├── data/
+│   ├── raw/                      # Original CODA dataset (available at https://www.synapse.org/Synapse:syn31472953/wiki/617828) 
+│   │   └── solicited_coughs/
+│   │       ├── audio/            # .wav files
+│   │       └── metadata/         # Clinical data
+│   └── processed/                # Mel-spectrograms & metadata
+│       └── features/             # Processed .npy files
 ├── src/
-│   ├── data_augmentation.py      # ESC-50 + Gaussian noise augmentation
+│   ├── data_augmentation.py      # Noise augmentation pipeline
 │   └── utils.py                  # Helper functions
-├── data/                         # TB cough dataset and processed features
-│   ├── raw/solicited_coughs/
-│   └── processed/
-└── ESC-50/                       # Environmental sound dataset
-   ├── audio/
-   └── meta/
-\\\
+├── requirements.txt           # Dependencies
+└── README.md                  # This file
+```
 
 ## Technical Approach
 
@@ -141,6 +138,7 @@ The model includes a comprehensive evaluation:
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
 
