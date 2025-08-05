@@ -10,14 +10,15 @@ This project implements a machine learning pipeline for TB screening using:
 - **Data Augmentation**: ESC-50 environmental noise for robustness
 - **Imbalanced Learning**: Handles 30% TB+, 70% TB- distribution
 
-  Mel-Spectrograms → CNN Encoder → Embeddings (256D) 
-                                      ↓
-Clinical Features ────────────→ XGBoost Classifier
-                                      ↓
-                              Logistic Regression
-                                   (Stacker)
-                                      ↓
-                              Final TB Prediction
+```mermaid
+graph TD
+    A[Mel-Spectrograms] --> B[CNN Encoder]
+    B --> C[Embeddings (256D)]
+    D[Clinical Features] --> E[XGBoost Classifier]
+    C --> E
+    E --> F[Logistic Regression (Stacker)]
+    F --> G[Final TB Prediction]
+````
 
 ## Performance
 
@@ -138,6 +139,7 @@ The model includes a comprehensive evaluation:
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
 
