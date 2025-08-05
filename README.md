@@ -64,10 +64,18 @@ AcousticTB/
 
 ## Technical Approach
 
-### Focal Loss for Imbalanced Data
-- **gamma=2.0**: Strong focus on hard examples
-- **alpha=0.7**: Moderate TB+ emphasis
-- **AUROC optimization**: Medical screening focused
+### Deep Learning Architecture 
+CNN Encoder (256 parameters: 1.2M)
+- Conv2D(64) → BatchNorm → Conv2D(64) → MaxPool → Dropout(0.2)
+- Conv2D(128) → BatchNorm → Conv2D(128) → MaxPool → Dropout(0.3)  
+- Conv2D(256) → BatchNorm → Conv2D(256) → MaxPool → Dropout(0.4)
+- GlobalAvgPool → Dense(512) → Dense(256) → Dense(1, sigmoid)
+
+### Focal Loss
+- focal_loss = -α * (1-p_t)^γ * log(p_t)
+- γ = 2.0: Strong focus on hard examples
+- α = 0.25: Moderate class balancing
+- Optimized for AUROC in a medical context
 
 ### Data Augmentation Strategy
 - **Clean cough sounds**: Original recordings
@@ -81,7 +89,7 @@ AcousticTB/
 3. **Logistic Regression**: Final stacking layer
 
 ### Parameters
-## XGBoost:
+XGBoost:
 learning_rate: 0.094
 n_estimators: 673
 max_depth: 6
@@ -91,7 +99,7 @@ reg_alpha: 0.067
 reg_lambda: 0.186
 scale_pos_weight: 5.23
 
-## LogReg: 
+### LogReg: 
 solver: lbfgs
 max_iterations: 2000
 regularization: L2 (C=1.0)
@@ -130,5 +138,6 @@ The model includes a comprehensive evaluation:
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
