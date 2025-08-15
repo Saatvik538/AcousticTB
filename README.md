@@ -128,8 +128,8 @@ Designed for resource-limited clinical settings where:
 - Robust to environmental noise conditions
 
 ### Dataset
-TB cough audio: CODA TB DREAM dataset (restricted; request access on [Synapse]([url](https://www.synapse.org/Synapse:syn31472953/wiki/619711)))
-Environmental sounds: ESC-50 ([public]([url](https://github.com/karolpiczak/ESC-50?tab=readme-ov-file#citing)))
+TB cough audio: CODA TB DREAM dataset (restricted; request access on [Synapse]: https://www.synapse.org/Synapse:syn31472953/wiki/619711
+Environmental sounds: ESC-50 https://github.com/karolpiczak/ESC-50?tab=readme-ov-file#citing
 Processing: 64×64 log-Mel spectrograms (librosa STFT + Mel filters; typical fs ≈ 22 kHz)
 
 ## Results Analysis
@@ -163,6 +163,7 @@ Training patients: 7817 | Validation patients: 1955
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
 
