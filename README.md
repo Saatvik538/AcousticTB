@@ -22,12 +22,24 @@ graph TD
     F --> G[Final TB Prediction]
 ```
 
-## Performance
+## Performance (Validation)
 
-- **ROC-AUC:** 0.821 (Excellent discrimination)  
-- **Specificity:** 78.8% (Surpasses WHO standards for TB screening tool)  
-- **NPV:** 85.4% (Negative predictive value)  
-- **Accuracy:** 75.2% (Overall performance)  
+| Metric | Value |
+|--------|-------|
+| **ROC-AUC** | **0.850** |
+| Sensitivity (Recall) | 72.9% |
+| Specificity | 80.4% |
+| PPV (Precision) | 61.8% |
+| NPV | 87.2% |
+| Accuracy | 78.1% |
+| PR-AUC | 0.748 |
+
+### Noise Robustness (AUC)
+- **Clean**: 0.862
+- **Gaussian**: 0.855  
+- **Environmental**: 0.833
+
+*Patient-wise split; results computed on a held-out validation set consistent with the notebook.* 
 
 ## Quick Start
 
@@ -90,20 +102,22 @@ CNN Encoder (256 parameters: 1.2M)
 
 ### Parameters
 XGBoost:
-learning_rate: 0.094
-n_estimators: 673
-max_depth: 6
-subsample: 0.842
-colsample_bytree: 0.789
-reg_alpha: 0.067
-reg_lambda: 0.186
-scale_pos_weight: 5.23
+learning_rate: 0.0751
+n_estimators: 661
+max_depth: 7
+subsample: 0.8320
+colsample_bytree: 0.8448
+reg_alpha: 0.0223
+reg_lambda: 0.2689
+scale_pos_weight: 6.1896
+objective: binary:logistic, eval_metric: auc, tree_method: hist
 
 ### LogReg: 
 solver: lbfgs
-max_iterations: 2000
-regularization: L2 (C=1.0)
+max_iter: 2000
+regularization: L2 (C = 0.1)
 class_weight: balanced
+5-fold CV TB-composite score ≈ 0.888 (0.56·Sensitivity + 0.44·Specificity)
 
 ## Medical Application
 
@@ -112,6 +126,11 @@ Designed for resource-limited clinical settings where:
 - High sensitivity required (avoid missing TB+ cases)
 - Acceptable specificity to minimize false alarms
 - Robust to environmental noise conditions
+
+###Dataset
+TB cough audio: CODA TB DREAM dataset (restricted; request access on [Synapse]([url](https://www.synapse.org/Synapse:syn31472953/wiki/619711)))
+Environmental sounds: ESC-50 ([public]([url](https://github.com/karolpiczak/ESC-50?tab=readme-ov-file#citing)))
+Processing: 64×64 log-Mel spectrograms (librosa STFT + Mel filters; typical fs ≈ 22 kHz)
 
 ## Results Analysis
 
@@ -124,7 +143,7 @@ The model includes a comprehensive evaluation:
 Results on validation set:
 Total samples: 5865 | TB+: 1785 (30.4%) | TB-: 4080 (69.6%)
 Training patients: 7817 | Validation patients: 1955
-<img width="1589" height="1189" alt="image" src="https://github.com/user-attachments/assets/9d919cec-5626-4b19-a992-7af0a3450c75" />
+<img width="723" height="537" alt="image" src="https://github.com/user-attachments/assets/fff0b7c8-7653-4638-b8b4-d9b2ac16c210" />
 
 
 ## Requirements
@@ -144,6 +163,7 @@ Training patients: 7817 | Validation patients: 1955
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
 
