@@ -100,8 +100,8 @@ CNN Encoder (256 parameters: 1.2M)
 2. **XGBoost**: Combines embeddings + clinical features
 3. **Logistic Regression**: Final stacking layer
 
-### Parameters
-XGBoost:
+## Parameters
+### XGBoost:
 learning_rate: 0.0751
 n_estimators: 661
 max_depth: 7
@@ -127,7 +127,7 @@ Designed for resource-limited clinical settings where:
 - Acceptable specificity to minimize false alarms
 - Robust to environmental noise conditions
 
-###Dataset
+### Dataset
 TB cough audio: CODA TB DREAM dataset (restricted; request access on [Synapse]([url](https://www.synapse.org/Synapse:syn31472953/wiki/619711)))
 Environmental sounds: ESC-50 ([public]([url](https://github.com/karolpiczak/ESC-50?tab=readme-ov-file#citing)))
 Processing: 64×64 log-Mel spectrograms (librosa STFT + Mel filters; typical fs ≈ 22 kHz)
@@ -163,6 +163,7 @@ Training patients: 7817 | Validation patients: 1955
 ## Key Innovation
 
 Advanced ensemble architecture combining deep learning and gradient boosting with **focal loss optimization** specifically tuned for medical screening scenarios where missing positive TB cases have significantly higher clinical cost than false positives.
+
 
 
 
